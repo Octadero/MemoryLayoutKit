@@ -1,11 +1,16 @@
 import XCTest
-@testable import MemoryLayoutKit
+import MemoryLayoutKit
 
 class MemoryLayoutKitTests: XCTestCase {
-    func testExample() {
+    func testCharPointerConstPointer() {
+        var array: [String]? = ["first", "second", "third"]
+        let pointer = try? array?.cArray(using: .utf8)
+        array = nil
+        XCTAssert(String(describing: pointer) == "Optional(Optional([first][second][third]))" , "Incorrect value.")
+        pointer??.deallocator()
     }
-
+    
     static var allTests = [
-        ("testExample", testExample),
-    ]
+        ("testCharPointerConstPointer", testCharPointerConstPointer),
+        ]
 }
