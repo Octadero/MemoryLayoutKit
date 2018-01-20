@@ -16,7 +16,7 @@
 
 import Foundation
 
-public struct CharStarConstStar: CustomStringConvertible {
+public class CharStarConstStar: CustomStringConvertible {
     public enum CharStarConstStarError: Error {
         case canNotComputeCStringPointer
     }
@@ -39,16 +39,6 @@ public struct CharStarConstStar: CustomStringConvertible {
         }
     }
     
-    public var deallocator: (() -> Void) {
-        return {
-            for index in 0..<self.count {
-                let pointer = UnsafeMutablePointer(mutating: self.pointerList[index])
-                pointer?.deallocate(capacity: self.sizes[index])
-            }
-            self.pointerList.deallocate(capacity: self.count)
-        }
-    }
-    
     public var description: String {
         var description = ""
         for index in 0..<count {
@@ -57,6 +47,14 @@ public struct CharStarConstStar: CustomStringConvertible {
             }
         }
         return description
+    }
+    
+    deinit {
+        for index in 0..<self.count {
+            let pointer = UnsafeMutablePointer(mutating: self.pointerList[index])
+            pointer?.deallocate(capacity: self.sizes[index])
+        }
+        self.pointerList.deallocate(capacity: self.count)
     }
 }
 
@@ -67,5 +65,4 @@ extension Array where Element == String {
     public func cArray(using encoding: String.Encoding = .utf8) throws -> CharStarConstStar {
         return try CharStarConstStar(array: self, using: encoding)
     }
-    
 }
