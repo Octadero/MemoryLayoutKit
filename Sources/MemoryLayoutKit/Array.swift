@@ -1,9 +1,18 @@
-//
-//  Array.swift
-//  MemoryLayoutKitPackageDescription
-//
-//  Created by Volodymyr Pavliukevych on 1/7/18.
-//
+/* Copyright 2017 The Octadero Authors. All Rights Reserved.
+ Created by Volodymyr Pavliukevych on 2017.
+ 
+ Licensed under the Apache License 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+ 
+ https://github.com/Octadero/MemoryLayoutKit/blob/master/LICENSE
+ 
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ */
 
 import Foundation
 
@@ -15,7 +24,7 @@ public struct CharStarConstStar: CustomStringConvertible {
     public let pointerList: UnsafeMutablePointer<UnsafePointer<Int8>?>
     public let count: Int
     public let encoding: String.Encoding
-    
+    public var sizes = [Int]()
     public init(array: [String], using encoding: String.Encoding) throws {
         count = array.count
         pointerList = UnsafeMutablePointer<UnsafePointer<Int8>?>.allocate(capacity: array.count)
@@ -26,12 +35,16 @@ public struct CharStarConstStar: CustomStringConvertible {
                 throw CharStarConstStarError.canNotComputeCStringPointer
             }
             pointerList[i] = UnsafePointer<Int8>(strdup(cString))
+            sizes.append(cString.count)
         }
     }
     
     public var deallocator: (() -> Void) {
         return {
-            self.pointerList.deinitialize()
+            for index in 0..<self.count {
+                let pointer = UnsafeMutablePointer(mutating: self.pointerList[index])
+                pointer?.deallocate(capacity: self.sizes[index])
+            }
             self.pointerList.deallocate(capacity: self.count)
         }
     }
