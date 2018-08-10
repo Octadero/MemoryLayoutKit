@@ -52,9 +52,9 @@ public class CharStarConstStar: CustomStringConvertible {
     deinit {
         for index in 0..<self.count {
             let pointer = UnsafeMutablePointer(mutating: self.pointerList[index])
-            pointer?.deallocate(capacity: self.sizes[index])
+            pointer?.deallocate()
         }
-        self.pointerList.deallocate(capacity: self.count)
+        self.pointerList.deallocate()
     }
 }
 

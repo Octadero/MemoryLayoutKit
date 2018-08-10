@@ -118,9 +118,9 @@ public extension SynchronizedArray {
 	///
 	/// - Parameter transform: A closure that accepts an element of this sequence as its argument and returns an optional value.
 	/// - Returns: An array of the non-nil results of calling transform with each element of the sequence.
-	func flatMap<ElementOfResult>(_ transform: (Element) -> ElementOfResult?) -> [ElementOfResult] {
+    public func compactMap<ElementOfResult>(_ transform: (Element) throws -> ElementOfResult?) rethrows -> [ElementOfResult] {
 		var result = [ElementOfResult]()
-		queue.sync { result = self.array.flatMap(transform) }
+        try queue.sync { result = try self.array.compactMap(transform) }
 		return result
 	}
 	
@@ -278,14 +278,13 @@ extension SynchronizedArray : Sequence {
 		}
 		return result
 	}
-	
-	public func filter(_ isIncluded: @escaping (SynchronizedArray.Iterator.Element) throws -> Bool) rethrows -> [SynchronizedArray.Iterator.Element] {
-		var result: [SynchronizedArray.Iterator.Element]?
-		try queue.sync(flags: .barrier) {
-			result = try array.filter(isIncluded)
-		}
-		return result!
-	}
+    public func filter(_ isIncluded: (SynchronizedArray.Element) throws -> Bool) rethrows -> [SynchronizedArray.Element] {
+        var result: [SynchronizedArray.Iterator.Element]?
+        try queue.sync(flags: .barrier) {
+            result = try array.filter(isIncluded)
+        }
+        return result!
+    }
 	
 	public func forEach(_ body: (SynchronizedArray.Iterator.Element) throws -> Swift.Void) rethrows {
 		try queue.sync(flags: .barrier) {

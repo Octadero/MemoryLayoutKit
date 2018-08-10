@@ -7,7 +7,6 @@ class MemoryLayoutKitTests: XCTestCase {
         let pointer = try? array?.cArray(using: .utf8)
         array = nil
         XCTAssert(String(describing: pointer) == "Optional(Optional([first][second][third]))" , "Incorrect value.")
-        pointer??.deallocator()
     }
     
     static var allTests = [

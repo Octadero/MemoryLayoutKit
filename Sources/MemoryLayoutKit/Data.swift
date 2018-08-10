@@ -28,7 +28,7 @@ public extension Data {
 		let pointer = UnsafeMutablePointer<T>.allocate(capacity: MemoryLayout<T>.size)
 		NSData(data: self).getBytes(pointer, length: MemoryLayout<T>.size)
 		let object = pointer.move()
-		pointer.deallocate(capacity: MemoryLayout<T>.size)
+		pointer.deallocate()
 		return object
 	}
 	
